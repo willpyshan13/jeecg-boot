@@ -8,6 +8,7 @@ import java.util.SortedMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.jeecg.common.config.mqtoken.UserTokenContext;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.PathMatcherUtil;
@@ -55,13 +56,13 @@ public class FeignConfig {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (null != attributes) {
                 HttpServletRequest request = attributes.getRequest();
-                log.info("Feign request: {}", request.getRequestURI());
+                log.debug("Feign request: {}", request.getRequestURI());
                 // 将token信息放入header中
                 String token = request.getHeader(CommonConstant.X_ACCESS_TOKEN);
                 if(token==null || "".equals(token)){
                     token = request.getParameter("token");
                 }
-                log.info("Feign request token: {}", token);
+                log.debug("Feign request token: {}", token);
                 requestTemplate.header(CommonConstant.X_ACCESS_TOKEN, token);
 
                 //根据URL地址过滤请求 【字典表参数签名验证】
@@ -88,6 +89,10 @@ public class FeignConfig {
                         e.printStackTrace();
                     }
                 }
+            }else{
+                String  token = UserTokenContext.getToken();
+                log.debug("Feign request token: {}", token);
+                requestTemplate.header(CommonConstant.X_ACCESS_TOKEN, token);
             }
         };
     }
